@@ -1,7 +1,7 @@
 {
   "defaultSeverity": "error",
   "extends": [
-    "tslint:recommended"
+    "tslint:latest"
   ],
   "jsRules": {
     "no-unused-expression": true
@@ -14,35 +14,25 @@
     ],
     "semicolon": [true, "never"],
     "indent": false,
-    "member-access": [
-      false
-    ],
-    "ordered-imports": [
-      false
-    ],
+    "deprecation": true,
     "max-line-length": [
       true,
-      150
+      100
     ],
     "member-ordering": [
       false
     ],
-    "curly": false,
-    "interface-name": [
-      false
-    ],
-    "array-type": [
-      false
-    ],
+    "member-access": true,
     "no-empty-interface": false,
     "no-empty": false,
-    "arrow-parens": false,
+    "arrow-parens": [true, "ban-single-arg-parens"],
     "object-literal-sort-keys": false,
-    "no-unused-expression": false,
+    "prefer-const": true,
+    "no-unused-variable": [true, {"ignore-pattern": "^_"}],
+    "no-unused-expression": [true, "allow-fast-null-checks", "allow-new" ],
+    "interface-name": false,
+    "cyclomatic-complexity": [true, 20],
     "max-classes-per-file": [
-      false
-    ],
-    "variable-name": [
       false
     ],
     "one-line": [
@@ -53,6 +43,12 @@
     ],
     "trailing-comma": [
       false
+    ],
+    "variable-name": [
+      true,
+      "ban-keywords",
+      "check-format",
+      "allow-leading-underscore"
     ]
   },
   "rulesDirectory": []

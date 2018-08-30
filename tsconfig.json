@@ -6,6 +6,13 @@
 
     "strict": true,
     "alwaysStrict": true,
+
+    // "noUnusedLocals": true,
+    // "noUnusedParameters": true,
+
+    "noImplicitThis": true,
+    "noImplicitAny": true,
+
     "esModuleInterop": true,
   },
 
@@ -15,8 +22,5 @@
 
   "exclude": [
     "node_modules",
-    "**/*.spec.ts",
-    "**/*.test.ts",
   ]
-
 }

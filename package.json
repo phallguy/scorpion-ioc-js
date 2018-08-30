@@ -10,7 +10,7 @@
     "lint": "tslint --force --project .",
     "test": "jest",
     "test:ci": "jest --ci --reporters jest-junit default",
-    "test:debug": "node --inspect-brk ./node_modules/.bin/jest --runInBand --watch",
+    "test:debug": "node --inspect-brk ./node_modules/.bin/jest --runInBand",
     "test:watch": "jest --watch --notify",
     "test:cov": "jest --coverage"
   },

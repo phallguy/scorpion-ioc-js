@@ -50,6 +50,9 @@
     ],
     "one-variable-per-declaration": [
       false
+    ],
+    "trailing-comma": [
+      false
     ]
   },
   "rulesDirectory": []

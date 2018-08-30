@@ -1,2 +1,1 @@
-export default class Container {
-}
+export { default } from "./scorpion";

@@ -37,9 +37,11 @@ export default class BindingMap {
     const oldBindings = this.bindings
     this.bindings = this.sharedBindings
 
-    fn(this)
-
-    this.bindings = oldBindings
+    try {
+      fn(this)
+    } finally {
+      this.bindings = oldBindings
+    }
   }
 
   public replicateFrom(bindingMap: BindingMap): void {

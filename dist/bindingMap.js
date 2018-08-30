@@ -21,8 +21,12 @@ export default class BindingMap {
     share(fn) {
         const oldBindings = this.bindings;
         this.bindings = this.sharedBindings;
-        fn(this);
-        this.bindings = oldBindings;
+        try {
+            fn(this);
+        }
+        finally {
+            this.bindings = oldBindings;
+        }
     }
     replicateFrom(bindingMap) {
         bindingMap.bindings.forEach(b => this.bindings.push(b.replicate()));

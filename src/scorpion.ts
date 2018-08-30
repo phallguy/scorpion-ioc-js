@@ -18,8 +18,8 @@ export default class Scorpion {
    * @param contract The class of the object to fetch.
    */
   public fetch(contract: Contract, ...args: any[]): any {
-    const hunt = new Hunt(this, contract, args)
-    return hunt.execute()
+    const hunt = new Hunt(this)
+    return hunt.fetch(contract, args)
   }
 
   public prepare(fn: PrepareFunction): void {

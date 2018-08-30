@@ -11,8 +11,8 @@ export default class Scorpion {
      * @param contract The class of the object to fetch.
      */
     fetch(contract, ...args) {
-        const hunt = new Hunt(this, contract, args);
-        return hunt.execute();
+        const hunt = new Hunt(this);
+        return hunt.fetch(contract, args);
     }
     prepare(fn) {
         fn(this.bindingMap);

@@ -4,10 +4,10 @@ import { Class, Contract, Fetcher, Injected } from "./types"
 
 import "reflect-metadata"
 
-/** @private */
+/** @hidden */
 export const HUNT_ANNOTATION_KEY = "__hunt__"
 
-/** @private */
+/** @hidden */
 export const SCORPION_ANNOTATION_KEY = "scorpion"
 
 // Limit how deep we'll go trying to resolve dependencies of dependencies.
@@ -15,9 +15,9 @@ export const SCORPION_ANNOTATION_KEY = "scorpion"
 // dependency and we should die instead of enter an infinite loop.
 const MAX_TRIP_DEPTH = 50
 
-/**
- * Provides context and binding resolution for a [[Scorpion.fetch]] request and
- * all the dependencies resolved to satisfy that request.
+/** 
+ * Provides context and [[Binding]] resolution for a [[Scorpion.fetch]]
+ * request and all the dependencies required to satisfy that request.
  */
 export default class Hunt implements Fetcher {
   private trips: number = 0
@@ -61,7 +61,14 @@ export default class Hunt implements Fetcher {
     }
   }
 
-  public resolveArguments(contract: Contract<any>): any[] {
+  /**
+   * Resolves any arguments needed by the constructor of the current
+   * [[contract]].
+   *
+   * @param contract The contract of the [[Binding]] that was resolved to
+   * satisfy the current [[contract]] being hunted.
+   */
+  public resolveArguments<T>(contract: Contract<T>): any[] {
     const paramTypes = Reflect.getMetadata("design:paramtypes", contract)
     if (!paramTypes) {
       return []

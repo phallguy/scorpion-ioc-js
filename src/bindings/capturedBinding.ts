@@ -2,6 +2,12 @@ import Binding from "../binding"
 import Hunt from "../hunt"
 import { Contract } from "../types"
 
+/**
+ * Implements a [[Binding]] that manages the lifetime of an instance to be returned
+ * each time a scorpion hunts to satisfy a contract.
+ *
+ * @typeparam T The type of the instance to be captured.
+ */
 export default class CapturedBinding<T> extends Binding<T> {
   private instance: any
 

@@ -13,7 +13,9 @@ export interface Injected {
 }
 
 /**
- * An [[Class]] that can be instantiated by a [[Scorpion]].
+ * An [[Class]] or factory function that instantiate an object.
+ *
+ * @typeparam T The type of instances that satisfy the contract.
  */
 export type Contract<T> = Class<T> // tslint:disable-line
 

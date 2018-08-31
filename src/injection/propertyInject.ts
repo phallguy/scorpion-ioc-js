@@ -1,8 +1,11 @@
+/** @hidden */
+
 import getHunt from "../getHunt"
 import { Class } from "../types"
 
 import "reflect-metadata"
 
+/** @hidden */
 export default function PropertyInject(
   target: Class<any>,
   name: string,

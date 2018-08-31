@@ -5,9 +5,10 @@
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc -p . -d",
+    "build": "yarn clean && yarn build:ts",
+    "build:ts": "tsc -p . -d",
     "build:watch": "tsc -p . --watch",
-    "build:docs": "typedoc --out dist/docs --ignoreCompilerErrors --listInvalidSymbolLinks --theme minimal --excludeNotExported --excludePrivate",
+    "build:docs": "typedoc --out docs --ignoreCompilerErrors --listInvalidSymbolLinks --theme default --excludeNotExported --excludePrivate --exclude '**/*.spec.ts'",
     "clean": "rimraf dist",
     "lint": "tslint --force --project .",
     "lint:fix": "tslint --fix --project .",
@@ -40,7 +41,8 @@
   },
   "dependencies": {
     "reflect-metadata": "^0.1.12",
-    "rimraf": "^2.6.2"
+    "rimraf": "^2.6.2",
+    "typedoc-clarity-theme": "^1.1.0"
   },
   "devDependencies": {
     "@types/express": "^4.16.0",

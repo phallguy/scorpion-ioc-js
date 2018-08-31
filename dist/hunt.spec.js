@@ -27,6 +27,10 @@ let Zoo = class Zoo {
         this.animal = animal;
     }
 };
+__decorate([
+    Inject,
+    __metadata("design:type", Lion)
+], Zoo.prototype, "cat", void 0);
 Zoo = __decorate([
     __param(0, Inject), __param(1, Inject),
     __metadata("design:paramtypes", [Keeper, Animal])
@@ -85,6 +89,14 @@ describe("Hunt", () => {
             xit("reuses an instance already resolved in a parent in the same hunt", () => { });
             xit("gets a new instance for a sibling", () => { });
         });
-        describe("property injection", () => { });
+        describe("property injection", () => {
+            it("injects properties", () => {
+                const zoo = hunt.fetch(Zoo);
+                expect(zoo.cat).toBeInstanceOf(Lion);
+            });
+            xit("reuses a parent object for a child in the same hunt", () => { });
+            xit("reuses an instance already resolved in a parent in the same hunt", () => { });
+            xit("gets a new instance for a sibling", () => { });
+        });
     });
 });

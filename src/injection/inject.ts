@@ -1,11 +1,12 @@
-import { Class } from "../types"
+import ParameterInject from "./parameterInject"
+import PropertyInject from "./propertyInject"
 
 export default function Inject(...args: any[]) {
   if (args.length < 3 || typeof args[2] === "undefined") {
-    throw new Error("not implemented")
+    PropertyInject(args[0], args[1], args[2])
   } else if (args.length === 3 && typeof args[2] === "number") {
-    return
+    ParameterInject(args[0], args[1], args[2])
+  } else {
+    throw new Error("Invalid @Inject Decorator declaration.")
   }
-
-  throw new Error("Invalid @Inject Decorator declaration.")
 }

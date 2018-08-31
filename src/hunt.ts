@@ -1,6 +1,6 @@
 import ClassBinding from "./bindings/classBinding"
 import Scorpion from "./scorpion"
-import { Contract, Class } from "./types"
+import { Class, Contract } from "./types"
 
 import "reflect-metadata"
 
@@ -39,7 +39,7 @@ export default class Hunt {
     }
   }
 
-  public resolveArguments( contract: Contract ): any[] {
+  public resolveArguments(contract: Contract): any[] {
     const paramTypes = Reflect.getMetadata("design:paramtypes", contract)
     if (!paramTypes) {
       return []
@@ -75,7 +75,7 @@ export default class Hunt {
     if (trip.instance instanceof this.contract) {
       return trip.instance
     } else if (!trip.instance && trip.contract === this.contract) {
-      throw new Error(`Circular dependency ${ this.contract.name } must be passed explicitly.`)
+      throw new Error(`Circular dependency ${this.contract.name} must be passed explicitly.`)
     }
 
     return null

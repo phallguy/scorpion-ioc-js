@@ -8,6 +8,9 @@ class Lion extends Animal {}
 class Keeper {}
 
 class Zoo {
+  @Inject
+  public readonly cat?: Lion
+
   constructor(@Inject public readonly keeper: Keeper, @Inject public readonly animal: Animal) {}
 }
 
@@ -75,6 +78,17 @@ describe("Hunt", () => {
       xit("gets a new instance for a sibling", () => {})
     })
 
-    describe("property injection", () => {})
+    describe("property injection", () => {
+
+      it("injects properties", () => {
+        const zoo = hunt.fetch(Zoo)
+
+        expect(zoo.cat).toBeInstanceOf(Lion)
+      })
+
+      xit("reuses a parent object for a child in the same hunt", () => {})
+      xit("reuses an instance already resolved in a parent in the same hunt", () => {})
+      xit("gets a new instance for a sibling", () => {})
+    })
   })
 })

@@ -3,6 +3,7 @@ import "reflect-metadata";
 export default class ClassBinding extends Binding {
     fetch(hunt) {
         const resolvedArgs = hunt.resolveArguments(this.contract);
-        return new this.contract(...resolvedArgs);
+        const instance = new this.contract(...resolvedArgs);
+        return instance;
     }
 }

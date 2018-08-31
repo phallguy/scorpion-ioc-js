@@ -1,4 +1,4 @@
-import { HUNT_ANNOTATION_KEY } from "../hunt"
+import getHunt from "../getHunt"
 import { Class } from "../types"
 
 import "reflect-metadata"
@@ -16,7 +16,7 @@ export default function PropertyInject(
     get() {
       let value = this[propertyKey]
       if (value === undefined) {
-        value = this[HUNT_ANNOTATION_KEY].fetch(type)
+        value = getHunt(this).fetch(type)
         this[propertyKey] = value
       }
 

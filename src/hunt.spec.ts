@@ -1,17 +1,25 @@
-import Hunt, { HUNT_ANNOTATION_KEY } from "./hunt"
+import getHunt from "./getHunt"
+import Hunt from "./hunt"
 import { Inject } from "./injection/index"
 import Scorpion from "./scorpion"
 
+class Logger {}
 class Animal {}
 class Bear extends Animal {}
 class Lion extends Animal {}
-class Keeper {}
+class Keeper {
+  constructor(@Inject public readonly logger?: Logger) {}
+}
 
 class Zoo {
   @Inject
   public readonly cat?: Lion
 
-  constructor(@Inject public readonly keeper: Keeper, @Inject public readonly animal: Animal) {}
+  constructor(
+    @Inject public readonly keeper: Keeper,
+    @Inject public readonly animal: Animal,
+    @Inject public readonly logger: Logger
+  ) {}
 }
 
 describe("Hunt", () => {
@@ -38,7 +46,13 @@ describe("Hunt", () => {
     it("assigns the hunt to the instance", () => {
       const lion = hunt.fetch(Lion)
 
-      expect(lion[HUNT_ANNOTATION_KEY]).toBe(hunt)
+      expect(getHunt(lion)).toBe(hunt)
+    })
+
+    it("assigns the scorpion to the instance", () => {
+      const lion = hunt.fetch(Lion)
+
+      expect(lion.scorpion).toBe(scorpion)
     })
 
     describe("constructor injection", () => {
@@ -56,39 +70,20 @@ describe("Hunt", () => {
         expect(zoo.animal).toBeInstanceOf(Bear)
       })
 
-      it("detects circular dependencies", () => {
-        class ZooKeeper extends Keeper {
-          constructor(@Inject theZoo: Zoo) {
-            super()
-          }
-        }
+      it("accepts explicitly provided null arguments", () => {
+        const zoo = hunt.fetch(Zoo, null)
 
-        const childScorpion = scorpion.replicate()
-        childScorpion.prepare(map => {
-          map.bind(ZooKeeper)
-        })
-        const childHunt = new Hunt(childScorpion)
-        expect(() => {
-          childHunt.fetch(Zoo)
-        }).toThrow(/Circular/)
+        expect(zoo.keeper).toBeNull()
+        expect(zoo.animal).toBeInstanceOf(Bear)
       })
-
-      xit("reuses a parent object for a child in the same hunt", () => {})
-      xit("reuses an instance already resolved in a parent in the same hunt", () => {})
-      xit("gets a new instance for a sibling", () => {})
     })
 
     describe("property injection", () => {
-
       it("injects properties", () => {
         const zoo = hunt.fetch(Zoo)
 
         expect(zoo.cat).toBeInstanceOf(Lion)
       })
-
-      xit("reuses a parent object for a child in the same hunt", () => {})
-      xit("reuses an instance already resolved in a parent in the same hunt", () => {})
-      xit("gets a new instance for a sibling", () => {})
     })
   })
 })

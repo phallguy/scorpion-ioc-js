@@ -1,6 +1,6 @@
 import { Class } from "../types"
 
-export default function isDerived(candidate: Class, base: Class): boolean {
+export default function isDerived(candidate: Class<any>, base: Class<any>): boolean {
   if (candidate === base) {
     return true
   }

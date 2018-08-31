@@ -6,7 +6,7 @@ class Derived extends Base {}
 class EvenMoreDerived extends Derived {}
 class Other {}
 
-class TestBinding extends Binding {}
+class TestBinding<T> extends Binding<T> {}
 
 describe("Binding", () => {
   it("should be defined", () => {

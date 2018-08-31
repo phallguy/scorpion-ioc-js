@@ -1,10 +1,13 @@
 import ClassBinding from "./bindings/classBinding"
 import Scorpion from "./scorpion"
-import { Class, Contract } from "./types"
+import { Class, Contract, Fetcher, Injected } from "./types"
 
 import "reflect-metadata"
 
+/** @private */
 export const HUNT_ANNOTATION_KEY = "__hunt__"
+
+/** @private */
 export const SCORPION_ANNOTATION_KEY = "scorpion"
 
 // Limit how deep we'll go trying to resolve dependencies of dependencies.
@@ -12,22 +15,43 @@ export const SCORPION_ANNOTATION_KEY = "scorpion"
 // dependency and we should die instead of enter an infinite loop.
 const MAX_TRIP_DEPTH = 50
 
-export default class Hunt {
+/**
+ * Provides context and binding resolution for a [[Scorpion.fetch]] request and
+ * all the dependencies resolved to satisfy that request.
+ */
+export default class Hunt implements Fetcher {
   private trips: number = 0
-  private _contract: Contract = Object
+  private _contract: Contract<any> = Object
   private _args: any[] = []
 
-  constructor(public readonly scorpion: Scorpion) { }
+  /**
+   * @param scorpion The [[Scorpion]] executing a hunt.
+   */
+  constructor(private readonly scorpion: Scorpion) {}
 
-  get contract(): Contract {
-    return this._contract 
+  /**
+   * The current [[Contract]] being hunted.
+   */
+  get contract(): Contract<any> {
+    return this._contract
   }
 
+  /**
+   * The constructor arguments to use when the [[contract]] is found.
+   */
   get args(): any[] {
     return this._args || []
   }
 
-  public fetch(contract: Contract, ...args: any[]) {
+  /**
+   * Fetch an instance of an object that satisfies the requested contract.
+   *
+   * @param contract The class of the object to fetch.
+   * @param args Additional arguments to pass to the constructor when
+   * instantiating an instance of the contract.
+   * @typeparam T The type of the `contract`.
+   */
+  public fetch<T, U extends Injected & T>(contract: Contract<T>, ...args: any[]): U {
     const restore = this.push(contract, args)
 
     try {
@@ -37,13 +61,13 @@ export default class Hunt {
     }
   }
 
-  public resolveArguments(contract: Contract): any[] {
+  public resolveArguments(contract: Contract<any>): any[] {
     const paramTypes = Reflect.getMetadata("design:paramtypes", contract)
     if (!paramTypes) {
       return []
     }
 
-    return paramTypes.map((param: Class, index: number) => {
+    return paramTypes.map((param: Class<any>, index: number) => {
       let value = this.args[index]
       if (value === undefined) {
         value = this.fetch(param)
@@ -72,7 +96,7 @@ export default class Hunt {
     return instance
   }
 
-  private push(contract: Contract, args: any[]) {
+  private push(contract: Contract<any>, args: any[]) {
     if (this.trips >= MAX_TRIP_DEPTH) {
       throw new Error(
         "Too many trips. There is probably a circular dependency that cannot be resolved."

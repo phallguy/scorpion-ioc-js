@@ -16,7 +16,7 @@ describe("createBinding", () => {
   })
 
   it("creates a factory binding when given a factory", () => {
-    const binding = createBinding(Example, () => {})
+    const binding = createBinding(Example, () => new Example())
 
     expect(binding).toBeInstanceOf(FactoryBinding)
   })

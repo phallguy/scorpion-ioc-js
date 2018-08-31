@@ -4,7 +4,7 @@ import { Class } from "../types"
 import "reflect-metadata"
 
 export default function PropertyInject(
-  target: Class,
+  target: Class<any>,
   name: string,
   descriptor: TypedPropertyDescriptor<Function> // tslint:disable-line
 ): void {

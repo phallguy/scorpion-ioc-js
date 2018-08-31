@@ -15,7 +15,7 @@ describe("container", () => {
       const parent = new Scorpion()
       const scorpion = new Scorpion(parent)
 
-      expect(scorpion.parent).toBe(parent)
+      expect(scorpion["parent"]).toBe(parent)
     })
 
     it("prepare scorpion if function given", () => {

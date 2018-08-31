@@ -1,16 +1,35 @@
 import Binding from "./binding"
 import BindingMap, { BindFunction } from "./bindingMap"
 import Hunt from "./hunt"
-import { Contract } from "./types"
+import { Contract, Fetcher, Injected } from "./types"
 
+/**
+ * Prepares bindings for a scorpion.
+ */
 export type PrepareFunction = BindFunction
 
-export default class Scorpion {
+/**
+ * An IoC container.
+ *
+ * Each container is configured with one or more [[Binding bindings]] that map
+ * a class to the concrete implementation that should be resolved.
+ */
+export default class Scorpion implements Fetcher {
   private readonly bindingMap: BindingMap
-  public readonly parent?: Scorpion
+  private readonly parent?: Scorpion
 
+  /**
+   * Creates a new Scorpion and optionally configures the bindings.
+   *
+   * @param prepare a callback function that maps the bindings. See
+   * [[prepare]].
+   */
+  constructor(prepare?: PrepareFunction)
+
+  /**
+   * [Internal] do not user
+   */
   constructor(parent?: Scorpion)
-  constructor(prepare: PrepareFunction)
   constructor(parentOrFunction?: any) {
     this.bindingMap = new BindingMap()
 
@@ -25,14 +44,25 @@ export default class Scorpion {
    * Fetch an instance of an object that satisfies the requested contract.
    *
    * @param contract The class of the object to fetch.
+   * @param args Additional arguments to pass to the constructor when
+   * instantiating an instance of the contract.
+   * @typeparam T The type of the `contract`.
    */
-  public fetch<T>(contract: Contract, ...args: any[]): T {
+  public fetch<T, U extends Injected & T>(contract: Contract<T>, ...args: any[]): U {
     Object.freeze(this.bindingMap)
 
     const hunt = new Hunt(this)
-    return hunt.fetch(contract, ...args) as T
+    return hunt.fetch(contract, ...args) as U
   }
 
+  /**
+   * Prepare bindings on the scorpion that map classes to concrete
+   * implementations and the lifetimes of the returned instances.
+   *
+   * See [[BindingMap]] for lifetime methods.
+   *
+   * @param fn A callback function that maps the bindings.
+   */
   public prepare(fn: PrepareFunction): void {
     if (Object.isFrozen(this.bindingMap)) {
       throw new Error("Cannot prepare after objects have been fetched.")
@@ -41,8 +71,15 @@ export default class Scorpion {
     fn(this.bindingMap)
   }
 
-  public findBinding(contract: Contract): Binding {
+  /**
+   * Finds the [[Binding]] that defines the strategy used for materializing
+   * instances of a `contract`.
+   *
+   * @param contract The class of the object that will be materialized.
+   */
+  public findBinding<T>(contract: Contract<T>): Binding<T> | null {
     let binding = this.bindingMap.find(contract)
+
     if (!binding && this.parent) {
       binding = this.parent.findBinding(contract)
     }
@@ -50,7 +87,12 @@ export default class Scorpion {
     return binding
   }
 
-  public replicate() {
+  /**
+   * Returns a new instance of a [[Scorpion]] with the same binding
+   * configuration. Instances fetched from the replicated scorpion will be
+   * scoped to the new scorpion.
+   */
+  public replicate(): Scorpion {
     const replica = new Scorpion(this)
     replica.bindingMap.replicateFrom(this.bindingMap)
 

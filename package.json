@@ -2,15 +2,16 @@
   "name": "scorpion-ioc",
   "version": "1.0.0",
   "description": "Simple IoC for node",
-  "main": "./index.js",
-  "typings": "./typescript-ioc.d.ts",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc -p .",
+    "build": "tsc -p . -d",
     "build:watch": "tsc -p . --watch",
+    "build:docs": "typedoc --out dist/docs --ignoreCompilerErrors --listInvalidSymbolLinks --theme minimal --excludeNotExported --excludePrivate",
     "clean": "rimraf dist",
     "lint": "tslint --force --project .",
     "lint:fix": "tslint --fix --project .",
-    "format": "prettier --write '**/*.ts' ",
+    "format": "prettier --write 'src/**/*.ts' ",
     "test": "jest",
     "test:ci": "jest --ci --reporters jest-junit default",
     "test:debug": "node --inspect-brk ./node_modules/.bin/jest --runInBand",
@@ -24,13 +25,19 @@
     "dependency injection",
     "inversion of control"
   ],
-  "author": "Paul Alexander",
+  "author": {
+    "name": "Paul Alexander",
+    "url": "http://phallguy.com/"
+  },
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/phallguy/scorpion-js/issues"
   },
   "homepage": "https://github.com/phallguy/scorpion-js#readme",
   "private": false,
+  "engines": {
+    "node": ">= 8.11.0"
+  },
   "dependencies": {
     "reflect-metadata": "^0.1.12",
     "rimraf": "^2.6.2"

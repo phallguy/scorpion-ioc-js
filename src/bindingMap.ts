@@ -3,18 +3,28 @@ import CapturedBinding from "./bindings/capturedBinding"
 import createBinding from "./createBinding"
 import { Contract } from "./types"
 
+/**
+ * Callback function that configures bindings on a [[BindingMap]].
+ *
+ * @param map map to define bindings on
+ *
+ * @see [[BindingMap.bind]]
+ * @see [[BindingMap.capture]]
+ * @see [[BindingMap.share]]
+ *
+ */
 export type BindFunction = (map: BindingMap) => void
 
 export default class BindingMap {
-  private bindings: any[]
-  private sharedBindings: any[]
+  private bindings: Binding<any>[]
+  private sharedBindings: Binding<any>[]
 
   constructor() {
     this.bindings = []
     this.sharedBindings = []
   }
 
-  public find(contract: Contract): Binding {
+  public find<T>(contract: Contract<T>): Binding<T> | null {
     return (
       this.bindings.find(b => b.isMatch(contract)) ||
       this.sharedBindings.find(b => b.isMatch(contract)) ||
@@ -22,11 +32,11 @@ export default class BindingMap {
     )
   }
 
-  public bind(contract: Contract, factory?: Factory) {
+  public bind<T>(contract: Contract<T>, factory?: Factory<T>) {
     this.bindings.unshift(createBinding(contract, factory))
   }
 
-  public capture(contract: Contract, factory?: Factory) {
+  public capture<T>(contract: Contract<T>, factory?: Factory<T>) {
     const binding = createBinding(contract, factory)
     const capturedBinding = new CapturedBinding(contract, binding)
 

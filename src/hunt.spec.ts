@@ -55,7 +55,6 @@ describe("Hunt", () => {
       expect(lion.scorpion).toBe(scorpion)
     })
 
-
     describe("constructor injection", () => {
       it("injects constructor arguments", () => {
         const zoo = hunt.fetch(Zoo)

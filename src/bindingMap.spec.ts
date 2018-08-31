@@ -1,4 +1,5 @@
 import BindingMap from "./bindingMap"
+import Binding from "./binding"
 
 class Example {}
 class AnotherExample extends Example {}
@@ -43,7 +44,7 @@ describe("BindingMap", () => {
         map.bind(SharedExample)
       })
 
-      const binding = bindingMap.find(Example)
+      const binding = bindingMap.find(Example) as Binding<Example>
 
       expect(binding).not.toBeNull()
       expect(binding.contract).toBe(Example)
@@ -54,7 +55,7 @@ describe("BindingMap", () => {
       bindingMap.bind(AnotherExample)
       bindingMap.bind(Example)
 
-      const binding = bindingMap.find(Example)
+      const binding = bindingMap.find(Example) as Binding<Example>
 
       expect(binding.contract).toBe(Example)
     })
@@ -93,7 +94,7 @@ describe("BindingMap", () => {
       const bindingMap = new BindingMap()
       bindingMap.bind(Example)
 
-      const binding = bindingMap.find(Example)
+      const binding = bindingMap.find(Example) as Binding<Example>
       binding.release = jest.fn()
 
       bindingMap.reset()
@@ -107,7 +108,7 @@ describe("BindingMap", () => {
         map.bind(Example)
       })
 
-      const binding = bindingMap.find(Example)
+      const binding = bindingMap.find(Example) as Binding<Example>
       binding.release = jest.fn()
 
       bindingMap.reset()

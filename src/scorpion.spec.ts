@@ -1,4 +1,5 @@
 import BindingMap from "./bindingMap"
+import Hunt from "./hunt"
 import Scorpion from "./scorpion"
 
 class Example {}
@@ -33,6 +34,15 @@ describe("container", () => {
       expect(example).toBeInstanceOf(Example)
     })
 
+    it("freezes the binding map", () => {
+      const scorpion = new Scorpion()
+      scorpion.fetch(Example)
+
+      expect(() => {
+        scorpion.prepare(() => {})
+      }).toThrow(/fetched/)
+    })
+
     it("gets a new instance for standard contracts", () => {
       const scorpion = new Scorpion()
       scorpion.prepare(map => {
@@ -55,6 +65,16 @@ describe("container", () => {
       const nextExample = scorpion.fetch(Example)
 
       expect(example).toBe(nextExample)
+    })
+
+    it("invokes the factory method if given", () => {
+      const factory = jest.fn(h => new Example())
+      const scorpion = new Scorpion(map => {
+        map.bind(Example, factory)
+      })
+
+      scorpion.fetch(Example)
+      expect(factory).toHaveBeenCalledWith(expect.any(Hunt))
     })
 
     describe("when replicated", () => {

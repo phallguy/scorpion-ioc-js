@@ -87,4 +87,50 @@ describe("BindingMap", () => {
       expect(replicaBinding).toBeNull()
     })
   })
+
+  describe(".reset", () => {
+    it("releases bindings", () => {
+      const bindingMap = new BindingMap()
+      bindingMap.bind(Example)
+
+      const binding = bindingMap.find(Example)
+      binding.release = jest.fn()
+
+      bindingMap.reset()
+
+      expect(binding.release).toHaveBeenCalled()
+    })
+
+    it("releases shared bindings", () => {
+      const bindingMap = new BindingMap()
+      bindingMap.share(map => {
+        map.bind(Example)
+      })
+
+      const binding = bindingMap.find(Example)
+      binding.release = jest.fn()
+
+      bindingMap.reset()
+
+      expect(binding.release).toHaveBeenCalled()
+    })
+
+    it("removes bindings", () => {
+      const bindingMap = new BindingMap()
+      bindingMap.bind(Example)
+      bindingMap.reset()
+
+      expect(bindingMap.find(Example)).toBeNull()
+    })
+
+    it("removes shared bindings", () => {
+      const bindingMap = new BindingMap()
+      bindingMap.share(map => {
+        map.bind(Example)
+      })
+
+      bindingMap.reset()
+      expect(bindingMap.find(Example)).toBeNull()
+    })
+  })
 })

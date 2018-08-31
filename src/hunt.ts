@@ -14,12 +14,12 @@ const MAX_TRIP_DEPTH = 50
 
 export default class Hunt {
   private trips: number = 0
-  private _contract?: Contract
-  private _args?: any[]
+  private _contract: Contract = Object
+  private _args: any[] = []
 
-  constructor(public readonly scorpion: Scorpion) {}
+  constructor(public readonly scorpion: Scorpion) { }
 
-  get contract(): Contract | undefined {
+  get contract(): Contract {
     return this._contract 
   }
 
@@ -53,10 +53,6 @@ export default class Hunt {
   }
 
   private fetchInstance() {
-    if (!this.contract) {
-      throw new Error("Cannot execute hunt, no current contract")
-    }
-
     let binding = this.scorpion.findBinding(this.contract)
 
     if (!binding) {

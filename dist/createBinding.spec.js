@@ -4,7 +4,7 @@ import createBinding from "./createBinding";
 class Example {
 }
 class CreateExample {
-    static create(scorpion) { }
+    static create(hunt) { }
 }
 describe("createBinding", () => {
     it("creates a class binding for a simple class", () => {

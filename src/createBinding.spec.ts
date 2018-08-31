@@ -1,11 +1,11 @@
 import ClassBinding from "./bindings/classBinding"
 import FactoryBinding from "./bindings/factoryBinding"
 import createBinding from "./createBinding"
-import Scorpion from "./scorpion"
+import Hunt from "./hunt"
 
 class Example {}
 class CreateExample {
-  public static create(scorpion: Scorpion) {}
+  public static create(hunt: Hunt) {}
 }
 
 describe("createBinding", () => {

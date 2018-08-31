@@ -1,4 +1,10 @@
 import ClassBinding from "./bindings/classBinding";
+import "reflect-metadata";
+export const HUNT_ANNOTATION_KEY = "__hunt__";
+// Limit how deep we'll go trying to resolve dependencies of dependencies.
+// Anything this deep is almost certainly due to an unresolved circular
+// dependency and we should die instead of enter an infinite loop.
+const MAX_TRIP_DEPTH = 50;
 class Trip {
     constructor(contract, args) {
         this.contract = contract;
@@ -17,7 +23,7 @@ export default class Hunt {
     get args() {
         return this.trip && this.trip.args;
     }
-    fetch(contract, args) {
+    fetch(contract, ...args) {
         this.push(contract, args);
         try {
             return this.execute();
@@ -26,18 +32,38 @@ export default class Hunt {
             this.pop();
         }
     }
+    resolveArguments(contract) {
+        const paramTypes = Reflect.getMetadata("design:paramtypes", contract);
+        if (!paramTypes) {
+            return [];
+        }
+        return paramTypes.map((param, index) => {
+            let value = this.args[index];
+            if (value === undefined) {
+                value = this.fetch(param);
+            }
+            return value;
+        });
+    }
     execute() {
-        return this.executeFromTrips() || this.executeFromSelf();
+        const instance = (this.trip.instance = this.executeFromTrips() || this.executeFromSelf());
+        if (!instance) {
+            throw new Error(`Could not resolve ${this.contract}`);
+        }
+        return instance;
     }
     executeFromTrips() {
         return this.trips.reduce((match, trip) => match || this.executeFromTrip(trip), undefined);
     }
     executeFromTrip(trip) {
-        if (!trip || !trip.instance) {
+        if (!trip) {
             return null;
         }
         if (trip.instance instanceof this.contract) {
             return trip.instance;
+        }
+        else if (!trip.instance && trip.contract === this.contract) {
+            throw new Error(`Circular dependency ${this.contract.name} must be passed explicitly.`);
         }
         return null;
     }
@@ -49,10 +75,17 @@ export default class Hunt {
         if (!binding) {
             binding = new ClassBinding(this.contract);
         }
-        return binding.fetch(this);
+        const instance = binding.fetch(this);
+        if (!(HUNT_ANNOTATION_KEY in instance)) {
+            Object.defineProperty(instance, HUNT_ANNOTATION_KEY, { value: this, writable: false });
+        }
+        return instance;
     }
     push(contract, args) {
         if (this.trip) {
+            if (this.trips.length >= MAX_TRIP_DEPTH) {
+                throw new Error("Too many trips. There is probably a circular dependency that cannot be resolved.");
+            }
             this.trips.push(this.trip);
         }
         this.trip = new Trip(contract, args);

@@ -1,9 +1,14 @@
 import BindingMap from "./bindingMap";
 import Hunt from "./hunt";
 export default class Scorpion {
-    constructor(parent) {
-        this.parent = parent;
+    constructor(parentOrFunction) {
         this.bindingMap = new BindingMap();
+        if (typeof parentOrFunction === "function") {
+            this.prepare(parentOrFunction);
+        }
+        else {
+            this.parent = parentOrFunction;
+        }
     }
     /**
      * Fetch an instance of an object that satisfies the requested contract.
@@ -11,10 +16,14 @@ export default class Scorpion {
      * @param contract The class of the object to fetch.
      */
     fetch(contract, ...args) {
+        Object.freeze(this.bindingMap);
         const hunt = new Hunt(this);
-        return hunt.fetch(contract, args);
+        return hunt.fetch(contract, ...args);
     }
     prepare(fn) {
+        if (Object.isFrozen(this.bindingMap)) {
+            throw new Error("Cannot prepare after objects have been fetched.");
+        }
         fn(this.bindingMap);
     }
     findBinding(contract) {

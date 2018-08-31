@@ -19,6 +19,7 @@
       true,
       100
     ],
+    "indent": [true, "spaces", 2],
     "member-ordering": [
       false
     ],

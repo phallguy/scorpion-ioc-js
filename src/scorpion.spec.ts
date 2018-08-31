@@ -1,3 +1,4 @@
+import BindingMap from "./bindingMap"
 import Scorpion from "./scorpion"
 
 class Example {}
@@ -6,6 +7,22 @@ class DerivedExample extends Example {}
 describe("container", () => {
   it("is defined", () => {
     expect(Scorpion).toBeDefined()
+  })
+
+  describe(".constructor", () => {
+    it("assigns a parent if given", () => {
+      const parent = new Scorpion()
+      const scorpion = new Scorpion(parent)
+
+      expect(scorpion.parent).toBe(parent)
+    })
+
+    it("prepare scorpion if function given", () => {
+      const fn = jest.fn()
+      new Scorpion(fn)
+
+      expect(fn).toHaveBeenCalledWith(expect.any(BindingMap))
+    })
   })
 
   describe(".fetch", () => {

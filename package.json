@@ -10,9 +10,10 @@
     "clean": "rimraf dist",
     "lint": "tslint --force --project .",
     "lint:fix": "tslint --fix --project .",
+    "format": "prettier --write '**/*.ts' ",
     "test": "jest",
     "test:ci": "jest --ci --reporters jest-junit default",
-    "test:debug": "node --inspect-brk .tnode_modules/.bin/jest --runInBand",
+    "test:debug": "node --inspect-brk ./node_modules/.bin/jest --runInBand",
     "test:watch": "jest --watch --notify",
     "test:cov": "jest --coverage"
   },
@@ -45,6 +46,7 @@
     "ts-loader": "^4.5.0",
     "ts-node": "^7.0.1",
     "tslint": "^5.11.0",
+    "typedoc": "TypeStrong/typedoc",
     "typescript": "^3.0.3"
   },
   "jest": {

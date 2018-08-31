@@ -8,6 +8,6 @@ export default class FactoryBinding extends Binding {
   }
 
   public fetch(hunt: Hunt): any {
-    return this.factory(hunt.scorpion)
+    return this.factory(hunt)
   }
 }

@@ -7,9 +7,18 @@ export type PrepareFunction = BindFunction
 
 export default class Scorpion {
   private readonly bindingMap: BindingMap
+  public readonly parent?: Scorpion
 
-  constructor(private readonly parent?: Scorpion) {
+  constructor(parent?: Scorpion)
+  constructor(prepare: PrepareFunction)
+  constructor(parentOrFunction?: any) {
     this.bindingMap = new BindingMap()
+
+    if (typeof parentOrFunction === "function") {
+      this.prepare(parentOrFunction)
+    } else {
+      this.parent = parentOrFunction as Scorpion
+    }
   }
 
   /**
@@ -18,11 +27,17 @@ export default class Scorpion {
    * @param contract The class of the object to fetch.
    */
   public fetch(contract: Contract, ...args: any[]): any {
+    Object.freeze(this.bindingMap)
+
     const hunt = new Hunt(this)
-    return hunt.fetch(contract, args)
+    return hunt.fetch(contract, ...args)
   }
 
   public prepare(fn: PrepareFunction): void {
+    if (Object.isFrozen(this.bindingMap)) {
+      throw new Error("Cannot prepare after objects have been fetched.")
+    }
+
     fn(this.bindingMap)
   }
 

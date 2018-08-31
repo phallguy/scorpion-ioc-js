@@ -5,6 +5,6 @@ export default class FactoryBinding extends Binding {
         this.factory = factory;
     }
     fetch(hunt) {
-        return this.factory(hunt.scorpion);
+        return this.factory(hunt);
     }
 }

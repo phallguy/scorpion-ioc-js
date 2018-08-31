@@ -1,14 +1,11 @@
 import Hunt from "./hunt"
 import isDerived from "./lib/isDerived"
-import Scorpion from "./scorpion"
 import { Contract } from "./types"
 
-export type Factory = (scorpion: Scorpion) => any
+export type Factory = (hunt: Hunt) => any
 
 export default abstract class Binding {
-  constructor(
-    public readonly contract: Contract
-  ) {}
+  constructor(public readonly contract: Contract) {}
 
   public isMatch(contract: Contract): boolean {
     return isDerived(this.contract, contract)

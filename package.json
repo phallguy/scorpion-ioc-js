@@ -18,7 +18,8 @@
     "test:debug": "node --inspect-brk ./node_modules/.bin/jest --runInBand",
     "test:watch": "jest --watch --notify",
     "test:cov": "jest --coverage",
-    "prepublishOnly": "yarn test && yarn build:docs"
+    "prepublishOnly": "yarn test",
+    "postpublish": "VERSION=$(node -p \"require('./package.json').version\"); git tag -s v$VERSION -f -m \"v$VERSION\" && git push --tags"
   },
   "repository": "git+https://github.com/phallguy/scorpion-ioc-js.git",
   "keywords": [

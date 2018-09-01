@@ -1,5 +1,5 @@
-import BindingMap from "./bindingMap"
 import Binding from "./binding"
+import BindingMap from "./bindingMap"
 
 class Example {}
 class AnotherExample extends Example {}

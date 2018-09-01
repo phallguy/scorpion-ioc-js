@@ -1,0 +1,55 @@
+version: 2
+
+jobs:
+  build:
+    working_directory: ~/scorpion-ioc-js
+
+    environment:
+      NODE_ENV: test
+
+    docker:
+      - image: node:8.11.3
+
+    steps:
+      - restore_cache:
+          keys:
+            - source-v1-{{ .Branch }}-{{ .Revision }}
+            - source-v1-{{ .Branch }}-
+            - source-v1-master
+
+      - checkout
+
+      - save_cache:
+          key: source-v1-{{ .Branch }}-{{ .Revision }}
+          paths:
+            - ".git"
+
+      - run: git submodule update --init --recursive --remote
+      - run: mkdir -p /tmp/test-results
+
+      - restore_cache:
+          keys:
+            - yarn-v1-{{ .Branch }}-{{ .Revision }}
+            - yarn-v1-{{ .Branch }}-
+            - yarn-v1-master
+
+      - run:
+          command: yarn --prefer-offline
+
+      - run:
+          command: yarn lint
+
+      - run:
+          command: yarn test:ci
+          environment:
+            JEST_JUNIT_OUTPUT: /tmp/test-results/jest/test-results.xml
+
+      - store_test_results:
+          path: /tmp/test-results
+
+      - save_cache:
+          key: yarn-v1-{{ .Branch }}-{{ .Revision }}
+          paths:
+            - /usr/local/share/.cache/yarn/v1
+
+

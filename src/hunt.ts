@@ -72,7 +72,7 @@ export default class Hunt implements Fetcher {
     // With ES5+ targets Reflect type defs are taken from automatically included ES2015
     // lib instead of the refelect-metadata module.
     // @ts-ignore:2339
-    const paramTypes = Reflect.getMetadata("design:paramtypes", contract) 
+    const paramTypes = Reflect.getMetadata("design:paramtypes", contract)
     if (!paramTypes) {
       return []
     }

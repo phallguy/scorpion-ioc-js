@@ -1,11 +1,11 @@
 {
   "name": "scorpion-ioc",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Simple IoC for node",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "scripts": {
-    "build": "yarn clean && yarn build:ts",
+    "build": "yarn clean && yarn build:ts && yarn build:docs",
     "build:ts": "tsc -p . -d",
     "build:watch": "tsc -p . --watch",
     "build:docs": "typedoc --out docs --ignoreCompilerErrors --listInvalidSymbolLinks --theme default --excludeNotExported --excludePrivate --exclude '**/*.spec.ts'",
@@ -17,9 +17,10 @@
     "test:ci": "jest --ci --reporters jest-junit default",
     "test:debug": "node --inspect-brk ./node_modules/.bin/jest --runInBand",
     "test:watch": "jest --watch --notify",
-    "test:cov": "jest --coverage"
+    "test:cov": "jest --coverage",
+    "prepublishOnly": "yarn test && yarn build:docs"
   },
-  "repository": "git+https://github.com/phallguy/scorpion-js.git",
+  "repository": "git+https://github.com/phallguy/scorpion-ioc-js.git",
   "keywords": [
     "ioc",
     "node",
@@ -32,9 +33,9 @@
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/phallguy/scorpion-js/issues"
+    "url": "https://github.com/phallguy/scorpion-ioc-js/issues"
   },
-  "homepage": "https://github.com/phallguy/scorpion-js#readme",
+  "homepage": "https://github.com/phallguy/scorpion-ioc-js#readme",
   "private": false,
   "engines": {
     "node": ">= 8.11.0"

@@ -12,6 +12,10 @@ export default function PropertyInject(
   descriptor: TypedPropertyDescriptor<Function> // tslint:disable-line
 ): void {
   const propertyKey = `__${name}__`
+
+  // With ES5+ targets Reflect type defs are taken from automatically included ES2015
+  // lib instead of the refelect-metadata module.
+  // @ts-ignore:2339
   const type = Reflect.getMetadata("design:type", target, name)
 
   Object.defineProperty(target.constructor.prototype, name, {

@@ -29,7 +29,7 @@ export default class Scorpion implements Fetcher {
   /**
    * [Internal] do not user
    */
-  constructor(parent?: Scorpion)
+  constructor(parent?: Scorpion) // tslint:disable-line
   constructor(parentOrFunction?: any) {
     this.bindingMap = new BindingMap()
 

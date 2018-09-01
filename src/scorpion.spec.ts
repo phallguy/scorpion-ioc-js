@@ -34,6 +34,13 @@ describe("container", () => {
       expect(example).toBeInstanceOf(Example)
     })
 
+    it( "returns an instance of built in classes", () => {
+      const scorpion = new Scorpion()
+      const now = scorpion.fetch(Date)
+
+      expect(now).toBeInstanceOf(Date)
+    })
+
     it("freezes the binding map", () => {
       const scorpion = new Scorpion()
       scorpion.fetch(Example)

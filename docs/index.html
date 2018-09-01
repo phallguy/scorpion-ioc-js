@@ -62,10 +62,275 @@
 	<div class="row">
 		<div class="col-8 col-content">
 			<div class="tsd-panel tsd-typography">
-				<p>Simple IoC for node.</p>
-				<p><em>(Need an IoC for ruby? Try <a href="https://github.com/phallguy/scorpion">Scorpion</a>)</em></p>
-				<p>A <a href="classes/_scorpion_.scorpion.html">Scorpion</a></p>
-				<p><a href="https://github.com/phallguy/scorpion-js">Source Code</a></p>
+				<p>Add IoC to TypeScript projects in node with minimal fuss and ceremony.</p>
+				<!-- vim-markdown-toc GFM -->
+				<ul>
+					<li><a href="#dependency-injection">Dependency Injection</a><ul>
+							<li><a href="#why-might-you-_want_-a-di-framework">Why might you <em>Want</em> a DI FRamework?</a><ul>
+									<li><a href="#propertydefault-injection">Property/Default Injection</a></li>
+									<li><a href="#constructorignorant-injection">Constructor/Ignorant Injection</a></li>
+								</ul>
+							</li>
+							<li><a href="#using-a-frameworklike-scorpion">Using a Framework...like Scorpion</a></li>
+						</ul>
+					</li>
+					<li><a href="#getting-started">Getting Started</a></li>
+					<li><a href="#using-scorpion">Using Scorpion</a><ul>
+							<li><a href="#decoration">Decoration</a></li>
+							<li><a href="#configuration">Configuration</a><ul>
+									<li><a href="#builders">Builders</a></li>
+									<li><a href="#singletons-and-object-lifetimes">Singletons and Object Lifetimes</a></li>
+									<li><a href="#nests">Nests</a></li>
+								</ul>
+							</li>
+							<li><a href="#contributing">Contributing</a></li>
+							<li><a href="#license">License</a></li>
+						</ul>
+					</li>
+				</ul>
+				<!-- vim-markdown-toc -->
+				<h1 id="dependency-injection">Dependency Injection</h1>
+				<p>Dependency injection helps to break explicit dependencies between objects making
+					it much easier to maintain a <a href="https://en.wikipedia.org/wiki/Single_responsibility_principle">single
+					responsibility</a>
+					and reduce <a href="https://en.wikipedia.org/wiki/Coupling_(computer_programming)">coupling</a>
+					in our class designs. This leads to more testable code and code that is more
+				resilient to change.</p>
+				<p>Most arguments for or against DI focus on testing, and given how easy it is to
+					mock objects in JavaScript, you don&#39;t really need a framework. If testing were the
+					only virtue they&#39;d be spot on. Despite its virtues DI doesn&#39;t come without its
+					own problems. However for larger projects that you expect to be long-lived, a DI
+				framework may help manage the complexity.</p>
+				<p>For a deeper background on Dependency Injection consider the
+					<a href="https://en.wikipedia.org/wiki/Dependency_injection">Wikipedia</a> article on the
+				subject.</p>
+				<h2 id="why-might-you-want-a-di-framework-">Why might you <em>Want</em> a DI FRamework?</h2>
+				<p>Assuming you&#39;ve embraced the general concept of DI why would you want to use a
+				framework. Lets consider the alternatives.</p>
+				<h3 id="property-default-injection">Property/Default Injection</h3>
+				<pre><code class="language-typescript"><span class="hljs-keyword">class</span> Hunter {
+  <span class="hljs-keyword">private</span> weapon: Weapon = <span class="hljs-keyword">new</span> Weapon()
+}</code></pre>
+				<p>In this scenario the Hunter class knows how to create a weapon and provides a
+				sane default, but allows the dependency to be overridden if needed.</p>
+				<p><strong>PROS</strong></p>
+				<ul>
+					<li>Very simple to understand and debug.</li>
+					<li>Provides basic flexibility.</li>
+					<li>The dependency is clearly defined.</li>
+				</ul>
+				<p><strong>CONS</strong></p>
+				<ul>
+					<li>Still coupled to a specific <em>type</em> of Weapon.</li>
+					<li>If multiple classes use this approach and you decide to upgrade your armory,
+						you&#39;d have to modify every line that creates new weapons. The factory pattern
+					can be used to solve that problem.</li>
+					<li>No global method of replacing a Weapon class with a specialized or
+					instrumented version. For example a ThreadLockedWeapon.</li>
+				</ul>
+				<h3 id="constructor-ignorant-injection">Constructor/Ignorant Injection</h3>
+				<pre><code class="language-typescript"><span class="hljs-keyword">class</span> Hunter {
+  <span class="hljs-keyword">constructor</span>(<span class="hljs-params"> <span class="hljs-keyword">private</span> readonly weapon: Weapon </span>) {}
+}</code></pre>
+				<p>Here Hunters can use any weapon and can be designed to an interface Weapon that
+				does not have an implementation yet.</p>
+				<p><strong>PROS</strong></p>
+				<ul>
+					<li>Provides flexibility</li>
+					<li>Work can proceed concurrently on Hunter and Weapon classes by different
+					engineers  on the team.</li>
+				</ul>
+				<p><strong>CONS</strong></p>
+				<ul>
+					<li>Hard to reason about Hunters and Weapons as a whole.</li>
+					<li>It pushes the responsibility of constructing dependencies onto the consumer of
+						the class. If the class is used in multiple places this becomes a maintenance
+					chore when changes are required.</li>
+					<li>It becomes tedious to use classes resulting in repeated boilerplate code that
+					distracts from the primary responsibility of the calling code.</li>
+				</ul>
+				<h2 id="using-a-framework-like-scorpion">Using a Framework...like Scorpion</h2>
+				<p>Using a good framework preserves the benefits of each method while minimizing
+					the cons. A DI framework works like an automatic factory system resolving
+					dependencies cleanly like a factory but without all the effort to create custom
+				factories.</p>
+				<p>A good framework should</p>
+				<ul>
+					<li>Make dependencies clear</li>
+					<li>Require a minimal amount of configuration or ceremony</li>
+				</ul>
+				<pre><code class="language-typescript"><span class="hljs-keyword">class</span> Hunter {
+  <span class="hljs-meta">@Inject</span> <span class="hljs-keyword">private</span> weapon?: Weapon
+
+  <span class="hljs-comment">// or</span>
+  <span class="hljs-keyword">constructor</span>(<span class="hljs-params"> @Inject <span class="hljs-keyword">private</span> weapon: Weapon </span>) {}
+}</code></pre>
+				<p>Here the dependency is clearly defined - and even creates accessors for getting
+					and setting the weapon. When a Hunter is created its dependencies are also
+				created - and any of their dependencies and so on. Usage is equally simple</p>
+				<pre><code class="language-typescript"><span class="hljs-keyword">const</span> hunter = scorpion.fetch( Hunter )
+hunter.weapon   <span class="hljs-comment">// =&gt; a Weapon</span></code></pre>
+				<p>Overriding the kind of weapons used by hunters.</p>
+				<pre><code class="language-typescript"><span class="hljs-keyword">class</span> Axe <span class="hljs-keyword">extends</span> Weapon {}
+
+scorpion.prepare(<span class="hljs-function"><span class="hljs-params">map</span> =&gt;</span> {
+  map.bind(Axe)
+})
+
+hunter = scorpion.fetch( Hunter )
+hunter.weapon <span class="hljs-comment">// =&gt; an Axe</span></code></pre>
+				<p>Overriding hunters!</p>
+				<pre><code class="language-typescript"><span class="hljs-keyword">class</span> Axe <span class="hljs-keyword">extends</span> Weapon {}
+<span class="hljs-keyword">class</span> Predator <span class="hljs-keyword">extends</span> Hunter {}
+
+scorpion.prepare(<span class="hljs-function"><span class="hljs-params">map</span> =&gt;</span> {
+  map.bind(Predator)
+  map.bind(Axe)
+})
+
+hunter = scorpion.fetch( Hunter )
+hunter        <span class="hljs-comment">// =&gt; Predator</span>
+hunter.weapon <span class="hljs-comment">// =&gt; an Axe</span></code></pre>
+				<h1 id="getting-started">Getting Started</h1>
+				<p>Add scorpion to your project</p>
+				<pre><code>npm <span class="hljs-keyword">install </span><span class="hljs-keyword">scorpion-ioc
+</span>
+<span class="hljs-comment"># or using yarn</span>
+yarn <span class="hljs-keyword">add </span><span class="hljs-keyword">scorpion-ioc</span></code></pre><h1 id="using-scorpion">Using Scorpion</h1>
+				<p>Out of the box Scorpion does not need any configuration and will work
+				immediately. You can hunt for any Class even if it hasn&#39;t been configured.</p>
+				<pre><code class="language-typescript">  <span class="hljs-keyword">const</span> now = scorpion.fetch( <span class="hljs-built_in">Date</span> )
+  now <span class="hljs-comment">// =&gt; Date</span></code></pre>
+				<h2 id="decoration">Decoration</h2>
+				<p>Scorpions feed their prey - any object that should be fed its dependencies when
+					it is created. Simply add the <a href="modules/_injection_inject_.html#inject">@Inject</a> annotation for any dependency
+				that you want resolved.</p>
+				<pre><code class="language-typescript"><span class="hljs-keyword">class</span> Keeper {
+  <span class="hljs-meta">@Inject</span>
+  <span class="hljs-keyword">private</span> readonly lunch?: FastFood
+}
+
+<span class="hljs-keyword">class</span> Vet {}
+
+<span class="hljs-keyword">class</span> Zoo {
+  <span class="hljs-meta">@Inject</span>
+  <span class="hljs-keyword">private</span> readonly keeper: Keeper
+
+  <span class="hljs-meta">@Inject</span>
+  <span class="hljs-keyword">private</span> readonly vet: Vet
+}
+
+<span class="hljs-keyword">const</span> zoo = scorpion.fetch( Zoo )
+zoo.keeper       <span class="hljs-comment">// =&gt; an instance of a Keeper</span>
+zoo.vet          <span class="hljs-comment">// =&gt; an instance of a Vet</span>
+zoo.keeper.lunch <span class="hljs-comment">// =&gt; an instance of FastFood</span></code></pre>
+				<p>All of your classes should be objects! And any dependency that is also an Object will
+				be fed.</p>
+				<h2 id="configuration">Configuration</h2>
+				<p>A good scorpion should be prepared to hunt. An effort that describes <em>what</em> the
+					scorpion can find for and <em>how</em> it should be found. Scorpion uses Classes as
+					the primary means of identifying dependency in favor of opaque labels or
+				strings.  This serves two benefits:</p>
+				<ol>
+					<li>The type of object expected by the dependency is clearly identified making it
+					easier to understand what the concrete dependencies really are.</li>
+					<li>Types explicitly declare the expected behavioral contract of an object&#39;s
+					dependencies.</li>
+				</ol>
+				<p>Most scorpion hunts will be for an instance of a specific class (or a more
+					derived class). If you bind a more concrete implementation and ask for the base
+				class, the more concrete version will be used.</p>
+				<pre><code class="language-typescript"><span class="hljs-keyword">class</span> User {}
+<span class="hljs-keyword">class</span> Employee <span class="hljs-keyword">extends</span> User {}
+
+scorpion.fetch( User )   <span class="hljs-comment">// =&gt; new User()</span>
+
+scorpion.prepare( <span class="hljs-function"><span class="hljs-params">map</span> =&gt;</span> {
+  map.bind( Employee )
+})
+
+scorpion.fetch( User )   <span class="hljs-comment">// =&gt; Employee.new()</span></code></pre>
+				<h3 id="builders">Builders</h3>
+				<p>Sometimes resolving the correct dependencies is a bit more dynamic. In those
+				cases you can use a builder block to hunt for dependency.</p>
+				<pre><code class="language-typescript"><span class="hljs-keyword">class</span> Sword {}
+<span class="hljs-keyword">class</span> Samurai <span class="hljs-keyword">extends</span> Sword {}
+<span class="hljs-keyword">class</span> Broad <span class="hljs-keyword">extends</span> Sword {}
+
+scorpion.prepare( <span class="hljs-function"><span class="hljs-params">map</span> =&gt;</span> {
+  map.bind( Sword, <span class="hljs-function">(<span class="hljs-params">fetcher, ...args</span>) =&gt;</span> {
+    scorpion.fetch( <span class="hljs-built_in">Math</span>.random() * <span class="hljs-number">2</span> &gt; <span class="hljs-number">1</span> ? Samurai : Broad )
+  })
+})</code></pre>
+				<p>Objects may also define their own static <code>.create</code> methods that receive a
+				<a href="interfaces/_types_.fetcher.html">fetcher</a> and arguments.</p>
+				<pre><code class="language-typescript"><span class="hljs-keyword">class</span> City {
+  <span class="hljs-keyword">static</span> create( fetcher, name ): City {
+    <span class="hljs-keyword">let</span> klass
+
+    <span class="hljs-keyword">if</span>( name == <span class="hljs-string">"New York"</span> ) {
+      klass = BigCity
+    } <span class="hljs-keyword">else</span> {
+      klass = SmallCity
+    }
+
+    fetcher.fetch( klass, name )
+  }
+
+  <span class="hljs-keyword">constructor</span>(<span class="hljs-params"> <span class="hljs-keyword">private</span> readonly name: <span class="hljs-built_in">string</span> </span>) {}
+}
+
+<span class="hljs-keyword">class</span> BigCity <span class="hljs-keyword">extends</span> City {}
+<span class="hljs-keyword">class</span> SmallCity <span class="hljs-keyword">extends</span> City {}</code></pre>
+				<h3 id="singletons-and-object-lifetimes">Singletons and Object Lifetimes</h3>
+				<p>Scorpion allows you to capture dependency and feed the same instance to everyone that
+				asks for a matching dependency.</p>
+				<p>DI singletons are different then global singletons in that each scorpion can
+					have a unique instance of the class that it shares with all of its objects. This
+					allows, for example, global variable like support per HTTP request without polluting
+				the global namespace or dealing with thread concurrency issues.</p>
+				<pre><code class="language-typescript"><span class="hljs-keyword">class</span> Logger {}
+
+scorpion.prepare( <span class="hljs-function"><span class="hljs-params">map</span> =&gt;</span> {
+  map.capture( Logger )
+}
+
+scorpion.fetch( Logger ) <span class="hljs-comment">// =&gt; Logger.new</span>
+scorpion.fetch( Logger ) <span class="hljs-comment">// =&gt; Previously captured logger</span></code></pre>
+				<blockquote>
+					<p>Captured dependencies are not shared with child scorpions (for example when
+						conceiving scorpions from a <a href="classes/_nest_.nest.html">Nest</a>. To share captured dependency with
+					children use <a href="classes/_bindingmap_.bindingmap.html#share">share</a>.</p>
+				</blockquote>
+				<h3 id="nests">Nests</h3>
+				<p>A scorpion nest is where a mother scorpion lives and conceives young -
+					duplicates of the mother but maintaining their own captured singletons. You
+					might prepare a module scoped nest and then <a href="classes/_nest_.nest.html#conceive">conceive</a> a new
+					Scorpion for each request. That way all preparation  performed by the mother is
+					shared with all the children it conceives so that configuration is established
+				when the application starts.</p>
+				<pre><code class="language-typescript"><span class="hljs-keyword">const</span> Logger {}
+<span class="hljs-keyword">const</span> SystemLogger <span class="hljs-keyword">extends</span> Logger {}
+
+<span class="hljs-keyword">const</span> nest = <span class="hljs-keyword">new</span> Nest( <span class="hljs-function"><span class="hljs-params">map</span> =&gt;</span> {
+  map.bind( SystemLogger )
+})
+
+<span class="hljs-comment">// In HTTP request startup code</span>
+scorpion = nest.conceive()
+scorpion.fetch( Logger  ) <span class="hljs-comment">// =&gt; SystemLogger.new</span></code></pre>
+				<h2 id="contributing">Contributing</h2>
+				<ol>
+					<li>Fork it ( <a href="https://github.com/phallguy/scorpion-js/fork">https://github.com/phallguy/scorpion-js/fork</a> )</li>
+					<li>Create your feature branch (<code>git checkout -b my-new-feature</code>)</li>
+					<li>Commit your changes (<code>git commit -am &#39;Add some feature&#39;</code>)</li>
+					<li>Push to the branch (<code>git push origin my-new-feature</code>)</li>
+					<li>Create a new Pull Request</li>
+				</ol>
+				<h2 id="license">License</h2>
+				<p><a href="http://opensource.org/licenses/MIT">The MIT License (MIT)</a></p>
+				<p>Copyright (c) 2018 Paul Alexander</p>
+				<p><a href="http://twitter.com/phallguy">@phallguy</a> / <a href="http://phallguy.com">http://phallguy.com</a></p>
 			</div>
 		</div>
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">

@@ -1,5 +1,9 @@
 Add IoC to TypeScript projects in node with minimal fuss and ceremony.
 
+[![Package Version](https://badge.fury.io/js/scorpion-ioc.svg)](https://www.npmjs.com/package/scorpion-ioc)
+[![GitHub version](https://badge.fury.io/gh/phallguy%2Fscorpion-ioc-js.svg)](https://badge.fury.io/gh/phallguy%2Fscorpion-ioc-js)
+[![Circle CI](https://circleci.com/gh/phallguy/scorpion-ioc-js.svg?style=svg)](https://circleci.com/gh/phallguy/scorpion-ioc-js)
+
 <!-- vim-markdown-toc GFM -->
 
 * [Dependency Injection](#dependency-injection)

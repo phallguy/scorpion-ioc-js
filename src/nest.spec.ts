@@ -1,5 +1,5 @@
-import Scorpion from "./scorpion"
 import Nest from "./nest"
+import Scorpion from "./scorpion"
 
 describe("Nest", () => {
   describe(".prepare", () => {

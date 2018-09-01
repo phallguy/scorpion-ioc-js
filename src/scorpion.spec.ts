@@ -15,7 +15,7 @@ describe("container", () => {
       const parent = new Scorpion()
       const scorpion = new Scorpion(parent)
 
-      expect(scorpion["parent"]).toBe(parent)
+      expect(scorpion.parent).toBe(parent)
     })
 
     it("prepare scorpion if function given", () => {
@@ -34,7 +34,7 @@ describe("container", () => {
       expect(example).toBeInstanceOf(Example)
     })
 
-    it( "returns an instance of built in classes", () => {
+    it("returns an instance of built in classes", () => {
       const scorpion = new Scorpion()
       const now = scorpion.fetch(Date)
 

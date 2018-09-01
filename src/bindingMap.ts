@@ -19,8 +19,8 @@ export type BindFunction = (map: BindingMap) => void
  * implementations of those contracts.
  */
 export default class BindingMap {
-  private bindings: Binding<any>[]
-  private sharedBindings: Binding<any>[]
+  private bindings: Array<Binding<any>>
+  private sharedBindings: Array<Binding<any>>
 
   constructor() {
     this.bindings = []

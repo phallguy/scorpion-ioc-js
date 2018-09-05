@@ -20,10 +20,10 @@ export default function PropertyInject(
 
   Object.defineProperty(target.constructor.prototype, name, {
     configurable: false,
-    get() {
+    async get() {
       let value = this[propertyKey]
       if (value === undefined) {
-        value = getHunt(this).fetch(type)
+        value = new Promise(resolve => resolve(getHunt(this).fetch(type)))
         this[propertyKey] = value
       }
 

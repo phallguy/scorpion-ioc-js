@@ -28,7 +28,7 @@ export interface Fetcher {
    * instantiating an instance of the `contract`.
    * @typeparam T The type of the `contract`.
    */
-  fetch<T, U extends Injected & T>(contract: Contract<T>, ...args: any[]): U
+  fetch<T, U extends Injected & T>(contract: Contract<T>, ...args: any[]): Promise<U>
 }
 
 /**
@@ -45,5 +45,14 @@ export interface ClassWithCreate<T> extends Class<T> {
    * [[Class]].
    * @param args The additional arguments used to pass to the constructor.
    */
-  create(fetcher: Fetcher, ...args: any[]): T
+  create(fetcher: Fetcher, ...args: any[]): Promise<T>
 }
+
+/**
+ * A factory function that can materialize an instance of type `T` for the
+ * current `hunt`.
+ *
+ * @param fetcher The currently executing hunt that can be used to resolve any dependencies.
+ * @typeparam T The type of the object to be materialized.
+ */
+export type Factory<T> = (fetcher: Fetcher, ...args: any[]) => Promise<T>

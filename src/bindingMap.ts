@@ -1,7 +1,7 @@
-import Binding, { Factory } from "./binding"
+import Binding from "./binding"
 import CapturedBinding from "./bindings/capturedBinding"
 import createBinding from "./createBinding"
-import { Contract } from "./types"
+import { Contract, Factory } from "./types"
 
 /**
  * Callback function that configures bindings on a [[BindingMap]].

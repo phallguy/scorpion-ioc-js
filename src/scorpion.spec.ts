@@ -15,6 +15,7 @@ describe("container", () => {
       const parent = new Scorpion()
       const scorpion = new Scorpion(parent)
 
+      // @ts-ignore:2341
       expect(scorpion.parent).toBe(parent)
     })
 
@@ -27,16 +28,16 @@ describe("container", () => {
   })
 
   describe(".fetch", () => {
-    it("returns an instance of the desired contract", () => {
+    it("returns an instance of the desired contract", async () => {
       const scorpion = new Scorpion()
-      const example = scorpion.fetch(Example)
+      const example = await scorpion.fetch(Example)
 
       expect(example).toBeInstanceOf(Example)
     })
 
-    it("returns an instance of built in classes", () => {
+    it("returns an instance of built in classes", async () => {
       const scorpion = new Scorpion()
-      const now = scorpion.fetch(Date)
+      const now = await scorpion.fetch(Date)
 
       expect(now).toBeInstanceOf(Date)
     })
@@ -50,54 +51,54 @@ describe("container", () => {
       }).toThrow(/fetched/)
     })
 
-    it("gets a new instance for standard contracts", () => {
+    it("gets a new instance for standard contracts", async () => {
       const scorpion = new Scorpion()
       scorpion.prepare(map => {
         map.bind(DerivedExample)
       })
 
-      const example = scorpion.fetch(Example)
-      const nextExample = scorpion.fetch(Example)
+      const example = await scorpion.fetch(Example)
+      const nextExample = await scorpion.fetch(Example)
 
       expect(example).not.toBe(nextExample)
     })
 
-    it("gets the same instance for captured contracts", () => {
+    it("gets the same instance for captured contracts", async () => {
       const scorpion = new Scorpion()
       scorpion.prepare(map => {
         map.capture(DerivedExample)
       })
 
-      const example = scorpion.fetch(Example)
-      const nextExample = scorpion.fetch(Example)
+      const example = await scorpion.fetch(Example)
+      const nextExample = await scorpion.fetch(Example)
 
       expect(example).toBe(nextExample)
     })
 
-    it("invokes the factory method if given", () => {
-      const factory = jest.fn(h => new Example())
+    it("invokes the factory method if given", async () => {
+      const factory = jest.fn(async h => new Example())
       const scorpion = new Scorpion(map => {
         map.bind(Example, factory)
       })
 
-      scorpion.fetch(Example)
+      await scorpion.fetch(Example)
       expect(factory).toHaveBeenCalledWith(expect.any(Hunt))
     })
 
     describe("when replicated", () => {
-      it("gets normal bindinds", () => {
+      it("gets normal bindinds", async () => {
         const scorpion = new Scorpion()
         scorpion.prepare(map => {
           map.bind(DerivedExample)
         })
         const replica = scorpion.replicate()
 
-        const example = replica.fetch(Example)
+        const example = await replica.fetch(Example)
 
         expect(example).toBeInstanceOf(DerivedExample)
       })
 
-      it("gets shared bindings", () => {
+      it("gets shared bindings", async () => {
         const scorpion = new Scorpion()
         scorpion.prepare(map => {
           map.share(() => {
@@ -105,12 +106,12 @@ describe("container", () => {
           })
         })
         const replica = scorpion.replicate()
-        const example = replica.fetch(Example)
+        const example = await replica.fetch(Example)
 
         expect(example).toBeInstanceOf(DerivedExample)
       })
 
-      it("does not get the same instance for captured contracts", () => {
+      it("does not get the same instance for captured contracts", async () => {
         const scorpion = new Scorpion()
         scorpion.prepare(map => {
           map.capture(DerivedExample)
@@ -118,22 +119,22 @@ describe("container", () => {
         const example = scorpion.fetch(Example)
 
         const replica = scorpion.replicate()
-        const nextExample = replica.fetch(Example)
+        const nextExample = await replica.fetch(Example)
 
         expect(example).not.toBe(nextExample)
       })
 
-      it("gets the same instance for shared and captured contracts", () => {
+      it("gets the same instance for shared and captured contracts", async () => {
         const scorpion = new Scorpion()
         scorpion.prepare(map => {
           map.share(() => {
             map.capture(DerivedExample)
           })
         })
-        const example = scorpion.fetch(Example)
+        const example = await scorpion.fetch(Example)
 
         const replica = scorpion.replicate()
-        const nextExample = replica.fetch(Example)
+        const nextExample = await replica.fetch(Example)
 
         expect(example).toBe(nextExample)
       })

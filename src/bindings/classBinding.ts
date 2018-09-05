@@ -8,10 +8,9 @@ import "reflect-metadata"
  * when a scorpion hunts for a contract.
  */
 export default class ClassBinding<T> extends Binding<T> {
-  public fetch(hunt: Hunt): any {
-    const resolvedArgs = hunt.resolveArguments(this.contract)
-    const instance = new this.contract(...resolvedArgs)
+  public async fetch(hunt: Hunt): Promise<T> {
+    const argPromises = hunt.resolveArguments(this.contract)
 
-    return instance
+    return Promise.all(argPromises).then(resolvedArgs => new this.contract(...resolvedArgs))
   }
 }

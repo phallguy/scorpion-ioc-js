@@ -3,18 +3,18 @@ import Scorpion from "./scorpion"
 
 describe("Nest", () => {
   describe(".prepare", () => {
-    it("fails if already conceived", () => {
+    it("fails if already conceived", async () => {
       const nest = new Nest()
-      nest.conceive()
+      await nest.conceive()
 
       expect(() => nest.prepare(m => {})).toThrow(/conceive/g)
     })
   })
 
   describe(".conceive", () => {
-    it("gets a scorpion", () => {
+    it("gets a scorpion", async () => {
       const nest = new Nest()
-      const scorpion = nest.conceive()
+      const scorpion = await nest.conceive()
 
       expect(scorpion).toBeInstanceOf(Scorpion)
     })

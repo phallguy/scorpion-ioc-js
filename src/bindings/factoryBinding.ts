@@ -1,6 +1,6 @@
-import Binding, { Factory } from "../binding"
+import Binding from "../binding"
 import Hunt from "../hunt"
-import { Contract } from "../types"
+import { Contract, Factory } from "../types"
 
 /**
  * Implements a [[Binding]] that delegates materialization to a [[Factory]]
@@ -11,7 +11,7 @@ export default class FactoryBinding<T> extends Binding<T> {
     super(contract)
   }
 
-  public fetch(hunt: Hunt): T {
-    return this.factory(hunt)
+  public fetch(hunt: Hunt): Promise<T> {
+    return this.factory(hunt, ...hunt.args)
   }
 }

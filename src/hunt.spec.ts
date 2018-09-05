@@ -37,41 +37,41 @@ describe("Hunt", () => {
       hunt = new Hunt(scorpion)
     })
 
-    it("gets an instance", () => {
-      const animal = hunt.fetch(Animal)
+    it("gets an instance", async () => {
+      const animal = await hunt.fetch(Animal)
 
       expect(animal).toBeInstanceOf(Bear)
     })
 
-    it("assigns the hunt to the instance", () => {
-      const lion = hunt.fetch(Lion)
+    it("assigns the hunt to the instance", async () => {
+      const lion = await hunt.fetch(Lion)
 
       expect(getHunt(lion)).toBe(hunt)
     })
 
-    it("assigns the scorpion to the instance", () => {
-      const lion = hunt.fetch(Lion)
+    it("assigns the scorpion to the instance", async () => {
+      const lion = await hunt.fetch(Lion)
 
       expect(lion.scorpion).toBe(scorpion)
     })
 
     describe("constructor injection", () => {
-      it("injects constructor arguments", () => {
-        const zoo = hunt.fetch(Zoo)
+      it("injects constructor arguments", async () => {
+        const zoo = await hunt.fetch(Zoo)
 
         expect(zoo.keeper).toBeInstanceOf(Keeper)
       })
 
-      it("accepts explicitly provided arguments", () => {
+      it("accepts explicitly provided arguments", async () => {
         const keeper = new Keeper()
-        const zoo = hunt.fetch(Zoo, keeper)
+        const zoo = await hunt.fetch(Zoo, keeper)
 
         expect(zoo.keeper).toBe(keeper)
         expect(zoo.animal).toBeInstanceOf(Bear)
       })
 
-      it("accepts explicitly provided null arguments", () => {
-        const zoo = hunt.fetch(Zoo, null)
+      it("accepts explicitly provided null arguments", async () => {
+        const zoo = await hunt.fetch(Zoo, null)
 
         expect(zoo.keeper).toBeNull()
         expect(zoo.animal).toBeInstanceOf(Bear)
@@ -79,10 +79,10 @@ describe("Hunt", () => {
     })
 
     describe("property injection", () => {
-      it("injects properties", () => {
-        const zoo = hunt.fetch(Zoo)
+      it("injects properties", async () => {
+        const zoo = await hunt.fetch(Zoo)
 
-        expect(zoo.cat).toBeInstanceOf(Lion)
+        expect(await zoo.cat).toBeInstanceOf(Lion)
       })
     })
   })

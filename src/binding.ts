@@ -3,15 +3,6 @@ import isDerived from "./lib/isDerived"
 import { Contract } from "./types"
 
 /**
- * A factory function that can materialize an instance of type `T` for the
- * current `hunt`.
- *
- * @param hunt The currently executing hunt that can be used to resolve any dependencies.
- * @typeparam T The type of the object to be materialized.
- */
-export type Factory<T> = (hunt: Hunt) => T
-
-/**
  * Associates a concrete class or factory for resolving contracts of the given
  * type `T`.
  *
@@ -36,7 +27,7 @@ export default abstract class Binding<T> {
   /**
    * Fetch an instance of the [[contract]].
    */
-  public fetch(hunt: Hunt): T {
+  public fetch(hunt: Hunt): Promise<T> {
     throw new Error("Not implemented")
   }
 

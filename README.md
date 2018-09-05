@@ -114,9 +114,10 @@ A good framework should
 
 ```typescript
 class Hunter {
-  @Inject private weapon?: Weapon
+  // Must await to access injected resource
+  @Inject private weapon?: Promise<Weapon>
 
-  // or
+  // or use constructor that always receives resolved instances
   constructor( @Inject private weapon: Weapon ) {}
 }
 ```
@@ -126,7 +127,7 @@ and setting the weapon. When a Hunter is created its dependencies are also
 created - and any of their dependencies and so on. Usage is equally simple
 
 ```typescript
-const hunter = scorpion.fetch( Hunter )
+const hunter = await scorpion.fetch( Hunter )
 hunter.weapon   // => a Weapon
 ```
 
@@ -139,7 +140,7 @@ scorpion.prepare(map => {
   map.bind(Axe)
 })
 
-hunter = scorpion.fetch( Hunter )
+hunter = await scorpion.fetch( Hunter )
 hunter.weapon // => an Axe
 ```
 
@@ -154,7 +155,7 @@ scorpion.prepare(map => {
   map.bind(Axe)
 })
 
-hunter = scorpion.fetch( Hunter )
+hunter = await scorpion.fetch( Hunter )
 hunter        // => Predator
 hunter.weapon // => an Axe
 ```
@@ -176,7 +177,7 @@ Out of the box Scorpion does not need any configuration and will work
 immediately. You can hunt for any Class even if it hasn't been configured.
 
 ```typescript
-  const now = scorpion.fetch( Date )
+  const now = await scorpion.fetch( Date )
   now // => Date
 ```
 
@@ -188,21 +189,19 @@ that you want resolved.
 
 ```typescript
 class Keeper {
-  @Inject
-  private readonly lunch?: FastFood
+  constructor( @Inject private readonly lunch?: FastFood ) {}
 }
 
 class Vet {}
 
 class Zoo {
-  @Inject
-  private readonly keeper: Keeper
-
-  @Inject
-  private readonly vet: Vet
+  constructor(
+    @Inject private readonly keeper: Keeper,
+    @Inject private readonly vet: Vet,
+  ) {}
 }
 
-const zoo = scorpion.fetch( Zoo )
+const zoo = await scorpion.fetch( Zoo )
 zoo.keeper       // => an instance of a Keeper
 zoo.vet          // => an instance of a Vet
 zoo.keeper.lunch // => an instance of FastFood
@@ -231,13 +230,13 @@ class, the more concrete version will be used.
 class User {}
 class Employee extends User {}
 
-scorpion.fetch( User )   // => new User()
+await scorpion.fetch( User )   // => new User()
 
 scorpion.prepare( map => {
   map.bind( Employee )
 })
 
-scorpion.fetch( User )   // => Employee.new()
+await scorpion.fetch( User )   // => Employee.new()
 ```
 
 ### Builders
@@ -251,9 +250,9 @@ class Samurai extends Sword {}
 class Broad extends Sword {}
 
 scorpion.prepare( map => {
-  map.bind( Sword, (fetcher, ...args) => {
+  map.bind( Sword, async (fetcher, ...args) =>
     scorpion.fetch( Math.random() * 2 > 1 ? Samurai : Broad )
-  })
+  )
 })
 ```
 
@@ -262,7 +261,7 @@ Objects may also define their own static `.create` methods that receive a
 
 ```typescript
 class City {
-  static create( fetcher, name ): City {
+  static async create( fetcher, name ): Promise<City> {
     let klass
 
     if( name == "New York" ) {
@@ -271,7 +270,7 @@ class City {
       klass = SmallCity
     }
 
-    fetcher.fetch( klass, name )
+    return fetcher.fetch( klass, name )
   }
 
   constructor( private readonly name: string ) {}
@@ -299,8 +298,8 @@ scorpion.prepare( map => {
   map.capture( Logger )
 }
 
-scorpion.fetch( Logger ) // => Logger.new
-scorpion.fetch( Logger ) // => Previously captured logger
+await scorpion.fetch( Logger ) // => Logger.new
+await scorpion.fetch( Logger ) // => Previously captured logger
 ```
 
 > Captured dependencies are not shared with child scorpions (for example when
@@ -325,8 +324,8 @@ const nest = new Nest( map => {
 })
 
 // In HTTP request startup code
-scorpion = nest.conceive()
-scorpion.fetch( Logger  ) // => SystemLogger.new
+await scorpion = nest.conceive()
+await scorpion.fetch( Logger  ) // => SystemLogger.new
 ```
 
 ## Contributing

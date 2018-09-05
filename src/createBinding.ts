@@ -1,7 +1,7 @@
-import { Factory } from "./binding"
+import Binding from "./binding"
 import ClassBinding from "./bindings/classBinding"
 import FactoryBinding from "./bindings/factoryBinding"
-import { ClassWithCreate, Contract } from "./types"
+import { ClassWithCreate, Contract, Factory } from "./types"
 
 /**
  * Creates a [[Binding]] that can be used to materialize instances of given
@@ -11,7 +11,7 @@ import { ClassWithCreate, Contract } from "./types"
  * @param factory A factory function used to materialize instances.
  * @typeparam T The type of instances created by the contract.
  */
-export default function createBinding<T>(contract: Contract<T>, factory?: Factory<T>) {
+export default function createBinding<T>(contract: Contract<T>, factory?: Factory<T>): Binding<T> {
   if (factory) {
     return new FactoryBinding(contract, factory)
   }

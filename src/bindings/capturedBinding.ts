@@ -9,13 +9,13 @@ import { Contract } from "../types"
  * @typeparam T The type of the instance to be captured.
  */
 export default class CapturedBinding<T> extends Binding<T> {
-  private instance: any
+  private instance?: Promise<T>
 
   constructor(contract: Contract<T>, private readonly binding: Binding<T>) {
     super(contract)
   }
 
-  public fetch(hunt: Hunt): T {
+  public fetch(hunt: Hunt): Promise<T> {
     if (!this.instance) {
       this.instance = this.binding.fetch(hunt)
     }
@@ -28,7 +28,7 @@ export default class CapturedBinding<T> extends Binding<T> {
   }
 
   public release(): void {
-    this.instance = null
+    this.instance = undefined
   }
 
   public replicate(): Binding<T> {

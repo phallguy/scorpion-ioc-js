@@ -48,11 +48,11 @@ export default class Scorpion implements Fetcher {
    * instantiating an instance of the contract.
    * @typeparam T The type of the `contract`.
    */
-  public fetch<T, U extends Injected & T>(contract: Contract<T>, ...args: any[]): U {
+  public async fetch<T, U extends Injected & T>(contract: Contract<T>, ...args: any[]): Promise<U> {
     Object.freeze(this.bindingMap)
 
     const hunt = new Hunt(this)
-    return hunt.fetch(contract, ...args) as U
+    return hunt.fetch(contract, ...args) as Promise<U>
   }
 
   /**

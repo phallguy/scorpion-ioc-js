@@ -35,8 +35,8 @@ export default class Nest {
   /**
    * Conceives a new [[Scorpion]] prepared in the same way as the nest.
    */
-  public conceive(): Scorpion {
+  public conceive(): Promise<Scorpion> {
     this.locked = true
-    return this.mother.replicate()
+    return new Promise((resolve, reject) => resolve(this.mother.replicate()))
   }
 }

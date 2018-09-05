@@ -1,8 +1,8 @@
+import "reflect-metadata"
+
 import ClassBinding from "./bindings/classBinding"
 import Scorpion from "./scorpion"
 import { Class, Contract, Fetcher, Injected } from "./types"
-
-import "reflect-metadata"
 
 /** @hidden */
 export const HUNT_ANNOTATION_KEY = "__hunt__"
@@ -51,7 +51,7 @@ export default class Hunt implements Fetcher {
    * instantiating an instance of the contract.
    * @typeparam T The type of the `contract`.
    */
-  public fetch<T, U extends Injected & T>(contract: Contract<T>, ...args: any[]): U {
+  public fetch<T, U extends Injected & T>(contract: Contract<T>, ...args: any[]): Promise<U> {
     const restore = this.push(contract, args)
 
     try {
@@ -68,7 +68,7 @@ export default class Hunt implements Fetcher {
    * @param contract The contract of the [[Binding]] that was resolved to
    * satisfy the current [[contract]] being hunted.
    */
-  public resolveArguments<T>(contract: Contract<T>): any[] {
+  public resolveArguments<T>(contract: Contract<T>): Array<Promise<any>> {
     // With ES5+ targets Reflect type defs are taken from automatically included ES2015
     // lib instead of the refelect-metadata module.
     // @ts-ignore:2339
@@ -93,17 +93,16 @@ export default class Hunt implements Fetcher {
       binding = new ClassBinding(this.contract)
     }
 
-    const instance = binding.fetch(this)
-
-    if (!(HUNT_ANNOTATION_KEY in instance)) {
-      Object.defineProperty(instance, HUNT_ANNOTATION_KEY, { value: this, writable: false })
-      Object.defineProperty(instance, SCORPION_ANNOTATION_KEY, {
-        value: this.scorpion,
-        writable: false,
-      })
-    }
-
-    return instance
+    return binding.fetch(this).then(instance => {
+      if (!(HUNT_ANNOTATION_KEY in instance)) {
+        Object.defineProperty(instance, HUNT_ANNOTATION_KEY, { value: this, writable: false })
+        Object.defineProperty(instance, SCORPION_ANNOTATION_KEY, {
+          value: this.scorpion,
+          writable: false,
+        })
+      }
+      return instance
+    })
   }
 
   private push(contract: Contract<any>, args: any[]) {

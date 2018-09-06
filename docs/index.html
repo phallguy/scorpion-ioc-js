@@ -63,6 +63,9 @@
 		<div class="col-8 col-content">
 			<div class="tsd-panel tsd-typography">
 				<p>Add IoC to TypeScript projects in node with minimal fuss and ceremony.</p>
+				<p><a href="https://www.npmjs.com/package/scorpion-ioc"><img src="https://badge.fury.io/js/scorpion-ioc.svg" alt="Package Version"></a>
+					<a href="https://badge.fury.io/gh/phallguy%2Fscorpion-ioc-js"><img src="https://badge.fury.io/gh/phallguy%2Fscorpion-ioc-js.svg" alt="GitHub version"></a>
+				<a href="https://circleci.com/gh/phallguy/scorpion-ioc-js"><img src="https://circleci.com/gh/phallguy/scorpion-ioc-js.svg?style=svg" alt="Circle CI"></a></p>
 				<!-- vim-markdown-toc GFM -->
 				<ul>
 					<li><a href="#dependency-injection">Dependency Injection</a><ul>
@@ -160,15 +163,16 @@
 					<li>Require a minimal amount of configuration or ceremony</li>
 				</ul>
 				<pre><code class="language-typescript"><span class="hljs-keyword">class</span> Hunter {
-  <span class="hljs-meta">@Inject</span> <span class="hljs-keyword">private</span> weapon?: Weapon
+  <span class="hljs-comment">// Must await to access injected resource</span>
+  <span class="hljs-meta">@Inject</span> <span class="hljs-keyword">private</span> weapon?: <span class="hljs-built_in">Promise</span>&lt;Weapon&gt;
 
-  <span class="hljs-comment">// or</span>
+  <span class="hljs-comment">// or use constructor that always receives resolved instances</span>
   <span class="hljs-keyword">constructor</span>(<span class="hljs-params"> @Inject <span class="hljs-keyword">private</span> weapon: Weapon </span>) {}
 }</code></pre>
 				<p>Here the dependency is clearly defined - and even creates accessors for getting
 					and setting the weapon. When a Hunter is created its dependencies are also
 				created - and any of their dependencies and so on. Usage is equally simple</p>
-				<pre><code class="language-typescript"><span class="hljs-keyword">const</span> hunter = scorpion.fetch( Hunter )
+				<pre><code class="language-typescript"><span class="hljs-keyword">const</span> hunter = <span class="hljs-keyword">await</span> scorpion.fetch( Hunter )
 hunter.weapon   <span class="hljs-comment">// =&gt; a Weapon</span></code></pre>
 				<p>Overriding the kind of weapons used by hunters.</p>
 				<pre><code class="language-typescript"><span class="hljs-keyword">class</span> Axe <span class="hljs-keyword">extends</span> Weapon {}
@@ -177,7 +181,7 @@ scorpion.prepare(<span class="hljs-function"><span class="hljs-params">map</span
   map.bind(Axe)
 })
 
-hunter = scorpion.fetch( Hunter )
+hunter = <span class="hljs-keyword">await</span> scorpion.fetch( Hunter )
 hunter.weapon <span class="hljs-comment">// =&gt; an Axe</span></code></pre>
 				<p>Overriding hunters!</p>
 				<pre><code class="language-typescript"><span class="hljs-keyword">class</span> Axe <span class="hljs-keyword">extends</span> Weapon {}
@@ -188,7 +192,7 @@ scorpion.prepare(<span class="hljs-function"><span class="hljs-params">map</span
   map.bind(Axe)
 })
 
-hunter = scorpion.fetch( Hunter )
+hunter = <span class="hljs-keyword">await</span> scorpion.fetch( Hunter )
 hunter        <span class="hljs-comment">// =&gt; Predator</span>
 hunter.weapon <span class="hljs-comment">// =&gt; an Axe</span></code></pre>
 				<h1 id="getting-started">Getting Started</h1>
@@ -199,28 +203,26 @@ hunter.weapon <span class="hljs-comment">// =&gt; an Axe</span></code></pre>
 yarn <span class="hljs-keyword">add </span><span class="hljs-keyword">scorpion-ioc</span></code></pre><h1 id="using-scorpion">Using Scorpion</h1>
 				<p>Out of the box Scorpion does not need any configuration and will work
 				immediately. You can hunt for any Class even if it hasn&#39;t been configured.</p>
-				<pre><code class="language-typescript">  <span class="hljs-keyword">const</span> now = scorpion.fetch( <span class="hljs-built_in">Date</span> )
+				<pre><code class="language-typescript">  <span class="hljs-keyword">const</span> now = <span class="hljs-keyword">await</span> scorpion.fetch( <span class="hljs-built_in">Date</span> )
   now <span class="hljs-comment">// =&gt; Date</span></code></pre>
 				<h2 id="decoration">Decoration</h2>
 				<p>Scorpions feed their prey - any object that should be fed its dependencies when
 					it is created. Simply add the <a href="modules/_injection_inject_.html#inject">@Inject</a> annotation for any dependency
 				that you want resolved.</p>
 				<pre><code class="language-typescript"><span class="hljs-keyword">class</span> Keeper {
-  <span class="hljs-meta">@Inject</span>
-  <span class="hljs-keyword">private</span> readonly lunch?: FastFood
+  <span class="hljs-keyword">constructor</span>(<span class="hljs-params"> @Inject <span class="hljs-keyword">private</span> readonly lunch?: FastFood </span>) {}
 }
 
 <span class="hljs-keyword">class</span> Vet {}
 
 <span class="hljs-keyword">class</span> Zoo {
-  <span class="hljs-meta">@Inject</span>
-  <span class="hljs-keyword">private</span> readonly keeper: Keeper
-
-  <span class="hljs-meta">@Inject</span>
-  <span class="hljs-keyword">private</span> readonly vet: Vet
+  <span class="hljs-keyword">constructor</span>(<span class="hljs-params">
+    @Inject <span class="hljs-keyword">private</span> readonly keeper: Keeper,
+    @Inject <span class="hljs-keyword">private</span> readonly vet: Vet,
+  </span>) {}
 }
 
-<span class="hljs-keyword">const</span> zoo = scorpion.fetch( Zoo )
+<span class="hljs-keyword">const</span> zoo = <span class="hljs-keyword">await</span> scorpion.fetch( Zoo )
 zoo.keeper       <span class="hljs-comment">// =&gt; an instance of a Keeper</span>
 zoo.vet          <span class="hljs-comment">// =&gt; an instance of a Vet</span>
 zoo.keeper.lunch <span class="hljs-comment">// =&gt; an instance of FastFood</span></code></pre>
@@ -243,13 +245,13 @@ zoo.keeper.lunch <span class="hljs-comment">// =&gt; an instance of FastFood</sp
 				<pre><code class="language-typescript"><span class="hljs-keyword">class</span> User {}
 <span class="hljs-keyword">class</span> Employee <span class="hljs-keyword">extends</span> User {}
 
-scorpion.fetch( User )   <span class="hljs-comment">// =&gt; new User()</span>
+<span class="hljs-keyword">await</span> scorpion.fetch( User )   <span class="hljs-comment">// =&gt; new User()</span>
 
 scorpion.prepare( <span class="hljs-function"><span class="hljs-params">map</span> =&gt;</span> {
   map.bind( Employee )
 })
 
-scorpion.fetch( User )   <span class="hljs-comment">// =&gt; Employee.new()</span></code></pre>
+<span class="hljs-keyword">await</span> scorpion.fetch( User )   <span class="hljs-comment">// =&gt; Employee.new()</span></code></pre>
 				<h3 id="builders">Builders</h3>
 				<p>Sometimes resolving the correct dependencies is a bit more dynamic. In those
 				cases you can use a builder block to hunt for dependency.</p>
@@ -258,14 +260,14 @@ scorpion.fetch( User )   <span class="hljs-comment">// =&gt; Employee.new()</spa
 <span class="hljs-keyword">class</span> Broad <span class="hljs-keyword">extends</span> Sword {}
 
 scorpion.prepare( <span class="hljs-function"><span class="hljs-params">map</span> =&gt;</span> {
-  map.bind( Sword, <span class="hljs-function">(<span class="hljs-params">fetcher, ...args</span>) =&gt;</span> {
+  map.bind( Sword, <span class="hljs-keyword">async</span> (fetcher, ...args) =&gt;
     scorpion.fetch( <span class="hljs-built_in">Math</span>.random() * <span class="hljs-number">2</span> &gt; <span class="hljs-number">1</span> ? Samurai : Broad )
-  })
+  )
 })</code></pre>
 				<p>Objects may also define their own static <code>.create</code> methods that receive a
 				<a href="interfaces/_types_.fetcher.html">fetcher</a> and arguments.</p>
 				<pre><code class="language-typescript"><span class="hljs-keyword">class</span> City {
-  <span class="hljs-keyword">static</span> create( fetcher, name ): City {
+  <span class="hljs-keyword">static</span> <span class="hljs-keyword">async</span> create( fetcher, name ): <span class="hljs-built_in">Promise</span>&lt;City&gt; {
     <span class="hljs-keyword">let</span> klass
 
     <span class="hljs-keyword">if</span>( name == <span class="hljs-string">"New York"</span> ) {
@@ -274,7 +276,7 @@ scorpion.prepare( <span class="hljs-function"><span class="hljs-params">map</spa
       klass = SmallCity
     }
 
-    fetcher.fetch( klass, name )
+    <span class="hljs-keyword">return</span> fetcher.fetch( klass, name )
   }
 
   <span class="hljs-keyword">constructor</span>(<span class="hljs-params"> <span class="hljs-keyword">private</span> readonly name: <span class="hljs-built_in">string</span> </span>) {}
@@ -295,8 +297,8 @@ scorpion.prepare( <span class="hljs-function"><span class="hljs-params">map</spa
   map.capture( Logger )
 }
 
-scorpion.fetch( Logger ) <span class="hljs-comment">// =&gt; Logger.new</span>
-scorpion.fetch( Logger ) <span class="hljs-comment">// =&gt; Previously captured logger</span></code></pre>
+<span class="hljs-keyword">await</span> scorpion.fetch( Logger ) <span class="hljs-comment">// =&gt; Logger.new</span>
+<span class="hljs-keyword">await</span> scorpion.fetch( Logger ) <span class="hljs-comment">// =&gt; Previously captured logger</span></code></pre>
 				<blockquote>
 					<p>Captured dependencies are not shared with child scorpions (for example when
 						conceiving scorpions from a <a href="classes/_nest_.nest.html">Nest</a>. To share captured dependency with
@@ -317,8 +319,8 @@ scorpion.fetch( Logger ) <span class="hljs-comment">// =&gt; Previously captured
 })
 
 <span class="hljs-comment">// In HTTP request startup code</span>
-scorpion = nest.conceive()
-scorpion.fetch( Logger  ) <span class="hljs-comment">// =&gt; SystemLogger.new</span></code></pre>
+<span class="hljs-keyword">await</span> scorpion = nest.conceive()
+<span class="hljs-keyword">await</span> scorpion.fetch( Logger  ) <span class="hljs-comment">// =&gt; SystemLogger.new</span></code></pre>
 				<h2 id="contributing">Contributing</h2>
 				<ol>
 					<li>Fork it ( <a href="https://github.com/phallguy/scorpion-js/fork">https://github.com/phallguy/scorpion-js/fork</a> )</li>

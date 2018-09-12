@@ -11,6 +11,8 @@ class Keeper {
   constructor(@Inject public readonly logger?: Logger) {}
 }
 
+class SpecialKeeper extends Keeper {}
+
 class Zoo {
   @Inject
   public readonly cat?: Lion
@@ -75,6 +77,13 @@ describe("Hunt", () => {
 
         expect(zoo.keeper).toBeNull()
         expect(zoo.animal).toBeInstanceOf(Bear)
+      })
+
+      it("injects super arguments if not overridden", async () => {
+        const keeper = await hunt.fetch(SpecialKeeper)
+
+        expect( keeper ).toBeInstanceOf(SpecialKeeper)
+        expect( keeper.logger ).toBeInstanceOf(Logger)
       })
     })
 
